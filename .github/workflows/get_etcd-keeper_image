@@ -1,0 +1,44 @@
+name: Pull and Save Etcd-Keeper
+
+on:
+  workflow_dispatch: # 手动触发执行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出仓库代码
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 从 Docker Hub 拉取 etcd-keeper 镜像
+      - name: Pull Etcd-Keeper Image
+        run: |
+          docker pull evildecay/etcdkeeper:latest
+
+      # 3. 创建存放镜像的目录
+      - name: Create Directory
+        run: mkdir -p images
+
+      # 4. 将镜像导出为 tar 包并存储在项目目录中
+      - name: Save Image to Project Folder
+        run: |
+          docker save evildecay/etcdkeeper:latest -o ./images/etcd-keeper-latest.tar
+
+      # 5. 上传 Artifact 以便你在 GitHub 页面下载
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: etcd-keeper-tarball
+          path: images/etcd-keeper-latest.tar
+          retention-days: 1
+
+      # 6. (可选) 如果你想将这个 tar 包提交回 Git 仓库 (不建议大文件这样做)
+      # - name: Commit and Push
+      #   run: |
+      #     git config --local user.email "action@github.com"
+      #     git config --local user.name "GitHub Action"
+      #     git add images/etcd-keeper-latest.tar
+      #     git commit -m "Add etcd-keeper image tarball"
+      #     git push
