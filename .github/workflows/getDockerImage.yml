@@ -1,0 +1,38 @@
+name: Pull and Save Docker Image
+
+on:
+  workflow_dispatch: # 手动触发
+    inputs:
+      image_name:
+        description: 'Docker Hub 镜像名称 (例如: nginx:latest)'
+        required: true
+        default: 'nginx:latest'
+
+jobs:
+  pull-and-save:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Pull Image from Docker Hub
+        run: |
+          docker pull ${{ github.event.inputs.image_name }}
+
+      - name: Create Images Directory
+        run: mkdir -p ./docker-images
+
+      - name: Save Image to Tarball
+        run: |
+          # 将镜像名中的非法字符（如 : /）替换为下划线以便作为文件名
+          SAFE_NAME=$(echo "${{ github.event.inputs.image_name }}" | sed 's/[\/:]/_/g')
+          docker save ${{ github.event.inputs.image_name }} -o ./docker-images/${SAFE_NAME}.tar
+          echo "镜像已保存至 ./docker-images/${SAFE_NAME}.tar"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-artifact
+          path: ./docker-images/
+          retention-days: 5
