@@ -23,11 +23,11 @@ jobs:
       - name: Save Image to Tarball
         run: |
           echo "正在将镜像打包为 tar 文件..."
-          docker save zilliz/attu:latest -o ./images/attu-latest.tar
+          docker save zilliz/attu:latest > attu_latest.tar
 
       - name: Upload to GitHub Actions
         uses: actions/upload-artifact@v4
         with:
           name: attu-offline-bundle # 下载时的文件名
-          path: images/attu-latest.tar
+          path: attu_latest.tar
           retention-days: 1 # 文件保留1天，节省你的仓库空间
