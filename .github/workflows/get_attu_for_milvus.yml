@@ -3,6 +3,10 @@ name: Pull and Save attu_milvus
 on:
   workflow_dispatch: # 手动触发执行
 
+# 设置全局环境变量，提前锁定 Node 24 运行环境
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,8 +16,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. 从 Docker Hub 拉取 etcd-keeper 镜像
-      - name: Pull Etcd-Keeper Image
+      # 2. 从 Docker Hub 拉取 attu 镜像
+      - name: Pull attu Image
         run: |
           docker pull zilliz/attu:latest
 
