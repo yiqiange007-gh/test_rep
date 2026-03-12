@@ -1,38 +1,33 @@
-name: Pull and Save attu_milvus
+name: Download Attu Image Offline
 
 on:
-  workflow_dispatch: # 手动触发执行
+  workflow_dispatch: # 手动点击 Run workflow 触发
 
-# 设置全局环境变量，提前锁定 Node 24 运行环境
 env:
+  # 强制使用 Node 24 消除警告，同时不设置任何冲突变量
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-   
-jobs:
-  build:
-    runs-on: ubuntu-latest
 
+jobs:
+  download-and-package:
+    runs-on: ubuntu-latest
+    
     steps:
-      # 1. 检出仓库代码
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. 从 Docker Hub 拉取 attu 镜像
-      - name: Pull attu Image
+      - name: Pull Attu Image
         run: |
+          echo "正在从 Docker Hub 拉取最新版 Attu..."
           docker pull zilliz/attu:latest
 
-      # 4. 将镜像导出为 tar 包并存储在项目目录中
-      - name: Save Image to Project Folder
+      - name: Save Image to Tarball
         run: |
+          echo "正在将镜像打包为 tar 文件..."
           docker save zilliz/attu:latest -o ./images/attu-latest.tar
 
-      # 5. 上传 Artifact 以便你在 GitHub 页面下载
-      - name: Upload Image Artifact
+      - name: Upload to GitHub Actions
         uses: actions/upload-artifact@v4
         with:
-          name: attu-tarball
+          name: attu-offline-bundle # 下载时的文件名
           path: images/attu-latest.tar
-          retention-days: 1
-
-     
+          retention-days: 1 # 文件保留1天，节省你的仓库空间
