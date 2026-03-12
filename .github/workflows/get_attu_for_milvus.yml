@@ -1,0 +1,33 @@
+name: Pull and Save attu_milvus
+
+on:
+  workflow_dispatch: # 手动触发执行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出仓库代码
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 从 Docker Hub 拉取 etcd-keeper 镜像
+      - name: Pull Etcd-Keeper Image
+        run: |
+          docker pull zilliz/attu:latest
+
+      # 4. 将镜像导出为 tar 包并存储在项目目录中
+      - name: Save Image to Project Folder
+        run: |
+          docker save zilliz/attu:latest -o ./images/attu-latest.tar
+
+      # 5. 上传 Artifact 以便你在 GitHub 页面下载
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: attu-tarball
+          path: images/attu-latest.tar
+          retention-days: 1
+
+     
