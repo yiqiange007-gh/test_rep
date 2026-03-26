@@ -1,0 +1,23 @@
+name: Build MindsDB Docker Image
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # 允许手动点击运行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull MindsDB image
+        run: docker pull mindsdb/mindsdb:latest
+
+      - name: Save image to tar file
+        run: docker save -o mindsdb.tar mindsdb/mindsdb:latest
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindsdb-docker-image
+          path: mindsdb.tar
